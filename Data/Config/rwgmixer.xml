@@ -624,7 +624,7 @@
 			<module name="riverScaled" type="ScaleBiasOutput">
 				<property name="sourceModule" value="landSmooth"/>
 				<property name="scale" value="0"/>
-				<property name="bias" value="-0.22"/>
+				<property name="bias" value="0"/>
 			</module>
 
 			<module name="worldController" type="FastNoise" seed_additive="-3">
