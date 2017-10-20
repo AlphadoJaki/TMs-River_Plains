@@ -553,12 +553,12 @@
 		<terrain_generator name="vanilla" use_old_final="false">
 			<module name="landSmooth" type="FastBillow" no_seed="true">
 				<property name="frequency" value="0.4"/>
-				<property name="roughness" value="4"/>
+				<property name="octaveCount" value="1"/>
 			</module>
 			<module name="landSmoothScaled" type="ScaleBiasOutput">
 				<property name="sourceModule" value="landSmooth"/>
-				<property name="scale" value="0.18"/>
-				<property name="bias" value="0.18"/><!--	This affects height of plains. If you wanna make them lower, edit into smaller number such as 0.13 or 0.08-->
+				<property name="scale" value="0"/>
+				<property name="bias" value="0.2"/><!--	This affects height of plains. If you wanna make them lower, edit into smaller number such as 0.13 or 0.08-->
 			</module>
 
 			<module name="landRough" type="FastBillow">
