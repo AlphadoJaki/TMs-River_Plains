@@ -572,8 +572,8 @@
 			</module>
 			<module name="mountainScaled" type="ScaleBiasOutput">
 				<property name="sourceModule" value="mountainFascioned"/>
-				<property name="scale" value="1.6"/>
-				<property name="bias" value="2.3"/><!--		This affects HEIGHT of mountains. If you wanna make them higher, edit this into higher number such as 2.6 or 3.
+				<property name="scale" value="1"/>
+				<property name="bias" value="1"/><!--		This affects HEIGHT of mountains. If you wanna make them higher, edit this into higher number such as 2.6 or 3.
 															*NOTE* Higher mountain has the side effect, which makes plain area higher. (approximately one 10th of the effect to mountain)-->
 			</module>
 
@@ -584,17 +584,17 @@
 			</module>
 			<module name="continentController" type="ClampOutput">
 				<property name="sourceModule" value="continentFirst"/>
-				<property name="bounds" value="-0.07,1.2"/>
+				<property name="bounds" value="-0.1,1.2"/>
 			</module>
 
 			<module name="continentMixed" type="Select">
 				<property name="controlModule" value="continentController"/>
 				<property name="sourceModule1" value="landSmoothScaled"/>
 				<property name="sourceModule2" value="mountainScaled"/>
-				<property name="bounds" value="1.45,100"/><!--	This affects the cliff of mountain. If you wanna make them more edgy / cliffy, edit *LEFT* number into *SMALLER* one such as 1.35 or 1.25.
+				<property name="bounds" value="0.3,100"/><!--	This affects the cliff of mountain. If you wanna make them more edgy / cliffy, edit *LEFT* number into *SMALLER* one such as 1.35 or 1.25.
 																*NOTE* More edgy mountain has the side effect, which make plains is less mixed with mountains / hills.-->
 
-				<property name="edgeFalloff" value="2.45"/><!--	This affects the smoothness of difference between mountain & plains. Larger number will make them more mixed. -->
+				<property name="edgeFalloff" value="0.9"/><!--	This affects the smoothness of difference between mountain & plains. Larger number will make them more mixed. -->
 			</module>
 
 
