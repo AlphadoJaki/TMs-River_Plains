@@ -587,17 +587,17 @@
 			<module name="mountainBase" type="FastRidgedMultifractal" seed_additive="1">
 				<property name="frequency" value="0.26"/>
 			</module>
-			<module name="mountainScaled" type="ScaleBiasOutput">
-				<property name="sourceModule" value="mountainBase"/>
-				<property name="scale" value="1.6"/>
-				<property name="bias" value="2.3"/><!--		This affects HEIGHT of mountains. If you wanna make them higher, edit this into higher number such as 2.6 or 3.
-															*NOTE* Higher mountain has the side effect, which makes plain area higher. (approximately one 10th of the effect to mountain)-->
-			</module>
 			<module name="mountainFascioned" type="FastTurbulence">
-				<property name="sourceModule" value="mountainScaled"/>
+				<property name="sourceModule" value="mountainBase"/>
 				<property name="frequency" value="0.5"/>
 				<property name="power" value="5"/>
 				<property name="roughness" value="8"/>
+			</module>
+			<module name="mountainScaled" type="ScaleBiasOutput">
+				<property name="sourceModule" value="mountainFascioned"/>
+				<property name="scale" value="1.6"/>
+				<property name="bias" value="2.3"/><!--		This affects HEIGHT of mountains. If you wanna make them higher, edit this into higher number such as 2.6 or 3.
+															*NOTE* Higher mountain has the side effect, which makes plain area higher. (approximately one 10th of the effect to mountain)-->
 			</module>
 
 			<module name="continentFirst" type="FastNoise" seed_additive="-2">
@@ -613,7 +613,7 @@
 			<module name="continentMixed" type="Select">
 				<property name="controlModule" value="continentController"/>
 				<property name="sourceModule1" value="landMixed"/>
-				<property name="sourceModule2" value="mountainFascioned"/>
+				<property name="sourceModule2" value="mountainScaled"/>
 				<property name="bounds" value="1.45,100"/><!--	This affects the cliff of mountain. If you wanna make them more edgy / cliffy, edit *LEFT* number into *SMALLER* one such as 1.35 or 1.25.
 																*NOTE* More edgy mountain has the side effect, which make plains is less mixed with mountains / hills.-->
 
