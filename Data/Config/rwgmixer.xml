@@ -553,51 +553,28 @@
 		<terrain_generator name="vanilla" use_old_final="false">
 			<module name="landSmooth" type="FastBillow" no_seed="true">
 				<property name="frequency" value="0.4"/>
-				<property name="roughness" value="4"/>
+				<property name="octaveCount" value="1"/>
 			</module>
 			<module name="landSmoothScaled" type="ScaleBiasOutput">
 				<property name="sourceModule" value="landSmooth"/>
-				<property name="scale" value="0.18"/>
-				<property name="bias" value="0.18"/><!--	This affects height of plains. If you wanna make them lower, edit into smaller number such as 0.13 or 0.08-->
-			</module>
-
-			<module name="landRough" type="FastBillow">
-				<property name="frequency" value="0.5"/>
-				<property name="roughness" value="6"/>
-				<property name="persistence" value="0.67"/><!--	This affects wavy area in plains. If you wanna make them less wavy, edit into smaller number, such as 0.6 or 0.55.-->
-			</module>
-			<module name="landRoughScaled" type="ScaleBiasOutput">
-				<property name="sourceModule" value="landRough"/>
-				<property name="scale" value="0.16"/>
-				<property name="bias" value="0.28"/>
-			</module>
-
-			<module name="landController" type="FastNoise" seed_additive="-1">
-				<property name="frequency" value="0.5"/>
-				<property name="roughness" value="2"/>
-			</module>
-			<module name="landMixed" type="Select">
-				<property name="controlModule" value="landController"/>
-				<property name="sourceModule1" value="landRoughScaled"/>
-				<property name="sourceModule2" value="landSmoothScaled"/>
-				<property name="bounds" value="-0.4,100"/>
-				<property name="edgeFalloff" value="0.3"/>
+				<property name="scale" value="0"/>
+				<property name="bias" value="0.2"/><!--	This affects height of plains. If you wanna make them lower, edit into smaller number such as 0.13 or 0.08-->
 			</module>
 
 			<module name="mountainBase" type="FastRidgedMultifractal" seed_additive="1">
 				<property name="frequency" value="0.26"/>
 			</module>
-			<module name="mountainScaled" type="ScaleBiasOutput">
-				<property name="sourceModule" value="mountainBase"/>
-				<property name="scale" value="1.6"/>
-				<property name="bias" value="2.3"/><!--		This affects HEIGHT of mountains. If you wanna make them higher, edit this into higher number such as 2.6 or 3.
-															*NOTE* Higher mountain has the side effect, which makes plain area higher. (approximately one 10th of the effect to mountain)-->
-			</module>
 			<module name="mountainFascioned" type="FastTurbulence">
-				<property name="sourceModule" value="mountainScaled"/>
-				<property name="frequency" value="0.5"/>
-				<property name="power" value="5"/>
+				<property name="sourceModule" value="mountainBase"/>
+				<property name="frequency" value="0.2"/>
+				<property name="power" value="3.5"/>
 				<property name="roughness" value="8"/>
+			</module>
+			<module name="mountainScaled" type="ScaleBiasOutput">
+				<property name="sourceModule" value="mountainFascioned"/>
+				<property name="scale" value="1"/>
+				<property name="bias" value="1"/><!--		This affects HEIGHT of mountains. If you wanna make them higher, edit this into higher number such as 2.6 or 3.
+															*NOTE* Higher mountain has the side effect, which makes plain area higher. (approximately one 10th of the effect to mountain)-->
 			</module>
 
 			<module name="continentFirst" type="FastNoise" seed_additive="-2">
@@ -607,17 +584,17 @@
 			</module>
 			<module name="continentController" type="ClampOutput">
 				<property name="sourceModule" value="continentFirst"/>
-				<property name="bounds" value="-0.07,1.2"/>
+				<property name="bounds" value="-0.1,1.2"/>
 			</module>
 
 			<module name="continentMixed" type="Select">
 				<property name="controlModule" value="continentController"/>
-				<property name="sourceModule1" value="landMixed"/>
-				<property name="sourceModule2" value="mountainFascioned"/>
-				<property name="bounds" value="1.45,100"/><!--	This affects the cliff of mountain. If you wanna make them more edgy / cliffy, edit *LEFT* number into *SMALLER* one such as 1.35 or 1.25.
+				<property name="sourceModule1" value="landSmoothScaled"/>
+				<property name="sourceModule2" value="mountainScaled"/>
+				<property name="bounds" value="0.3,100"/><!--	This affects the cliff of mountain. If you wanna make them more edgy / cliffy, edit *LEFT* number into *SMALLER* one such as 1.35 or 1.25.
 																*NOTE* More edgy mountain has the side effect, which make plains is less mixed with mountains / hills.-->
 
-				<property name="edgeFalloff" value="2.45"/><!--	This affects the smoothness of difference between mountain & plains. Larger number will make them more mixed. -->
+				<property name="edgeFalloff" value="0.9"/><!--	This affects the smoothness of difference between mountain & plains. Larger number will make them more mixed. -->
 			</module>
 
 
