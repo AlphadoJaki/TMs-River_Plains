@@ -566,8 +566,8 @@
 			</module>
 			<module name="mountainFascioned" type="FastTurbulence">
 				<property name="sourceModule" value="mountainBase"/>
-				<property name="frequency" value="0.5"/>
-				<property name="power" value="5"/>
+				<property name="frequency" value="0.2"/>
+				<property name="power" value="3.5"/>
 				<property name="roughness" value="8"/>
 			</module>
 			<module name="mountainScaled" type="ScaleBiasOutput">
