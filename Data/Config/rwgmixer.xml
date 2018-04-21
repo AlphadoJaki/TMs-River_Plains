@@ -816,12 +816,12 @@
 				<property name="constant" value="0.16"/>
 			</module>
 			<module name="riverSideBase" type="Constant">
-			<!--In-game -27-->
-				<property name="constant" value="0.01"/>
+			<!--No water-->
+				<property name="constant" value="0.15"/>
 			</module>
 			<module name="riverBase" type="Constant">
-			<!--In-game -38-->
-				<property name="constant" value="-0.1"/>
+			<!--No water-->
+				<property name="constant" value="0.14"/>
 			</module>
 
 			<module name="worldTransit" type="Select">
@@ -851,7 +851,7 @@
 
 
 			<module name="finalUpperZero" type="BiasOutput">
-			<!-- Invert @-11,191 GAP:202 -->
+			<!-- Invert @0,191 GAP:191 -->
 				<property name="sourceModule" value="worldRiver"/>
 				<property name="bias" value="-1.91"/>
 			</module>
@@ -860,19 +860,19 @@
 			</module>
 			<module name="finalLowerZero" type="BiasOutput">
 				<property name="sourceModule" value="finalUpperInvert"/>
-				<property name="bias" value="-2.02"/>
+				<property name="bias" value="-1.91"/>
 			</module>
 			<module name="finalLowerInvert" type="AbsoluteOutput">
 				<property name="sourceModule" value="finalLowerZero"/>
 			</module>
 			<module name="finalZeroZero" type="BiasOutput">
 				<property name="sourceModule" value="finalLowerInvert"/>
-				<property name="bias" value="-0.11"/>
+				<property name="bias" value="0"/>
 			</module>
 			<module name="finalOutput" type="ClampOutput">
 			<!-- Smoothing InvertPoints -->
 				<property name="sourceModule" value="finalZeroZero"/>
-				<property name="bounds" value="-0.10,1.90"/>
+				<property name="bounds" value="0.01,1.90"/>
 			</module>
 
 
