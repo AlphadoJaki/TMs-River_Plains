@@ -624,17 +624,30 @@
 				<property name="frequency" value="0.4"/>
 				<property name="octaveCount" value="6"/>
 			</module>
-			<module name="plainPlateLow" type="Constant">
+			<module name="plainPlateBase" type="FastNoise">
+			<!--               **Hack**
+			    Alternative of constant, which can avoid
+			    blank biome bug.-->
+				<property name="frequency" value="1"/>
+				<property name="octaveCount" value="1"/>
+			</module>
+			<module name="plainPlateLow" type="ScaleBiasOutput">
 			<!--In-game -12-->
-				<property name="constant" value="0.16"/>
+				<property name="sourceModule" value="plainPlateBase"/>
+				<property name="scale" value="0.005"/>
+				<property name="bias" value="0.16"/>
 			</module>
-			<module name="plainPlateMiddle" type="Constant">
+			<module name="plainPlateMiddle" type="ScaleBiasOutput">
 			<!--In-game 4-->
-				<property name="constant" value="0.32"/>
+				<property name="sourceModule" value="plainPlateBase"/>
+				<property name="scale" value="0.005"/>
+				<property name="bias" value="0.32"/>
 			</module>
-			<module name="plainPlateHigh" type="Constant">
+			<module name="plainPlateHigh" type="ScaleBiasOutput">
 			<!--In-game 20-->
-				<property name="constant" value="0.48"/>
+				<property name="sourceModule" value="plainPlateBase"/>
+				<property name="scale" value="0.005"/>
+				<property name="bias" value="0.48"/>
 			</module>
 			<module name="plainPlateBase" type="Select">
 				<property name="controlModule" value="plainPlateCtrl"/>
