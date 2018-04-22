@@ -622,6 +622,13 @@
 				<property name="frequency" value="0.4"/>
 				<property name="octaveCount" value="6"/>
 			</module>
+			<module name="plainPlateBase" type="FastNoise">
+			<!--               **Hack**
+			    Alternative of constant, which can avoid
+			    blank biome bug.-->
+				<property name="frequency" value="1"/>
+				<property name="octaveCount" value="1"/>
+			</module>
 			<module name="plainPlateLow" type="Constant">
 			<!--In-game -12-->
 				<property name="constant" value="0.16"/>
