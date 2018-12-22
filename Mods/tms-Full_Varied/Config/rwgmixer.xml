@@ -1,0 +1,397 @@
+<configs>
+<set xpath="/*/terrain_generators">
+	<terrain_generator name="vanilla" base_height="32" water_level="41">
+		<module name="landSmoothBase" type="FastNoise" seed_additive="0">
+			<property name="frequency" value="0.3"/>
+			<property name="octaveCount" value="5"/>
+		</module>
+		<module name="landSmoothClamped" type="ClampOutput">
+			<property name="sourceModule" value="landSmoothBase"/>
+			<property name="bounds" value="-1,1"/>
+		</module>
+		<module name="landSmoothScaled" type="ScaleBiasOutput">
+			<property name="sourceModule" value="landSmoothClamped"/>
+			<property name="scale" value="0.05"/>
+			<property name="bias" value="0.27"/>
+		</module>
+
+		<module name="landJiggleBase" type="FastNoise" seed_additive="10">
+			<property name="frequency" value="1.2"/>
+		</module>
+		<module name="landJiggleController" type="ScaleBiasOutput">
+			<property name="sourceModule" value="landJiggleBase"/>
+			<property name="scale" value="0.4"/>
+			<property name="bias" value="0.5"/>
+		</module>
+		<module name="landRoughBase" type="FastBillow" seed_additive="5">
+			<property name="frequency" value="0.6"/>
+			<property name="octaveCount" value="3"/>
+		</module>
+		<module name="landRough" type="Multiply">
+			<property name="sourceModule1" value="landJiggleController"/>
+			<property name="sourceModule2" value="landRoughBase"/>
+		</module>
+		<module name="landRoughScaled" type="ScaleOutput">
+			<property name="sourceModule" value="landRough"/>
+			<property name="scale" value="0.05"/>
+		</module>
+		<module name="landJiggled" type="Add">
+			<property name="sourceModule1" value="landSmoothScaled"/>
+			<property name="sourceModule2" value="landRoughScaled"/>
+		</module>
+		<!--<module name="landSmoothScaled" type="Constant">
+			<property name="constant" value="0.2"/>
+		</module>-->
+
+
+		<module name="constant" type="Constant"/>
+		<module name="hillBaseBase" type="Billow" seed_additive="0">
+		<!--Controls distance of hill peak
+		    Smaller frequency, wider distance.-->
+			<property name="frequency" value="5"/>
+			<property name="octaveCount" value="1"/>
+		</module>
+		<module name="hillBase" type="FastTurbulence" seed_additive="1">
+		<!--Make a variety of hill peak distance
+		    Higher frequency, variety appears even in small area
+		    Higher power, much more variety appears-->
+			<property name="sourceModule" value="hillBaseBase"/>
+			<property name="frequency" value=".4"/>
+			<property name="power" value=".2"/>
+			<property name="roughness" value="6"/>
+		</module>
+		<!--<module name="hill" type="CurveOutput">
+			<property name="sourceModule" value="hillBase"/>
+			<property name="source_module1" value="hillBase"/>
+			<property name="controlPoints" value="-0.8,-0.4; -0.7,-0.4; -0.6,-0.39; -0.5,-0.38; -0.4,-0.34; -0.3,-0.28; -0.2,-0.19; -0.1,-0.1; 0,0; 0.1,0.1; 0.2,0.2; 0.3,0.3; 0.4,0.38; 0.5,0.44; 0.6,0.48; 0.7,0.49; 0.8,0.5; 0.9,0.5"/>
+		</module>--> <!--CurveOutput won't produce smoother terrain-->
+		<module name="hill" type="ClampOutput">
+		<!--Add some variety of hills.
+		    Some are flat top, some are curving top. (higher bounds)
+		    Also, remove too much intensed valley. (lower bounds)-->
+			<property name="sourceModule" value="hillBase"/>
+			<property name="bounds" value="-0.4,0.5"/>
+		</module>
+		<module name="hillInvert" type="InvertOutput">
+		<!--Alternative of hill, this has narrow top.-->
+			<property name="sourceModule" value="hill"/>
+		</module>
+
+		<module name="plainModCtrl" type="FastNoise" seed_additive="2">
+		<!--Controls how frequently exchange wide top and narrow top hills.
+		    Higher frequently, more frequently exchange.-->
+			<property name="frequency" value="0.4"/>
+			<property name="octaveCount" value="3"/>
+		</module>
+		<module name="plainModBaseBase" type="Select">
+			<property name="controlModule" value="plainModCtrl"/>
+			<property name="sourceModule1" value="hillInvert"/>
+			<property name="sourceModule2" value="hill"/>
+			<property name="bounds" value="0,100"/>
+		</module>
+		<module name="plainModBase" type="Select">
+		<!--Balancing area of flat, narrow top hill and wide top hill.
+		    bounds controls size of area.
+		                  -1 to "left bounds" is narrow top hill
+		       "left bounds" to "right bounds is flat plains
+		      "right bounds" to 1             is wide top hill
+
+		    edgeFalloff controls size of intermediate area of 3 areas
+		      intermediate area appears each side of each bounds-->
+			<property name="controlModule" value="plainModCtrl"/>
+			<property name="sourceModule1" value="plainModBaseBase"/>
+			<property name="sourceModule2" value="constant"/>
+			<property name="bounds" value="-0.65,0.65"/>
+			<property name="edgeFalloff" value="0.35"/>
+		</module>
+		<module name="plainMod" type="ScaleOutput">
+		<!--Decides peak height of hills : 30 = 15x2-->
+			<property name="sourceModule" value="plainModBase"/>
+			<property name="scale" value="0.15"/>
+		</module>
+
+		<module name="plainPlateCtrl" type="FastNoise" seed_additive="3">
+		<!--Controls how frequently base height of plains change.-->
+			<property name="frequency" value="0.4"/>
+			<property name="octaveCount" value="6"/>
+		</module>
+		<module name="plainPlateBase" type="FastNoise">
+		<!--               **Hack**
+		    Alternative of constant, which can avoid
+		    blank biome bug.-->
+			<property name="frequency" value="1"/>
+			<property name="octaveCount" value="1"/>
+		</module>
+		<module name="plainPlateLow" type="ScaleBiasOutput">
+		<!--In-game -12-->
+			<property name="sourceModule" value="plainPlateBase"/>
+			<property name="scale" value="0.005"/>
+			<property name="bias" value="0.16"/>
+		</module>
+		<module name="plainPlateMiddle" type="ScaleBiasOutput">
+		<!--In-game 4-->
+			<property name="sourceModule" value="plainPlateBase"/>
+			<property name="scale" value="0.005"/>
+			<property name="bias" value="0.32"/>
+		</module>
+		<module name="plainPlateHigh" type="ScaleBiasOutput">
+		<!--In-game 20-->
+			<property name="sourceModule" value="plainPlateBase"/>
+			<property name="scale" value="0.005"/>
+			<property name="bias" value="0.48"/>
+		</module>
+		<module name="plainPlateBase" type="Select">
+			<property name="controlModule" value="plainPlateCtrl"/>
+			<property name="sourceModule1" value="plainPlateLow"/>
+			<property name="sourceModule2" value="plainPlateHigh"/>
+			<property name="bounds" value="0,100"/>
+		</module>
+		<module name="plainPlate" type="Select">
+		<!--Balancing each base height of plains
+		    bounds controls size of area
+		                  -1 to "left bounds"  is Low
+		       "left bounds" to "right bounds" is Middle
+		      "right bounds" to 1              is High
+		    edgeFalloff controls size of intermediate area
+		      each sides of each bounds is intermediate area-->
+			<property name="controlModule" value="plainPlateCtrl"/>
+			<property name="sourceModule1" value="plainPlateBase"/>
+			<property name="sourceModule2" value="plainPlateMiddle"/>
+			<property name="bounds" value="-0.5,0.5"/>
+			<property name="edgeFalloff" value="0.15"/>
+		</module>
+		<module name="plainOutput" type="Add">
+			<property name="sourceModule1" value="plainMod"/>
+			<property name="sourceModule2" value="plainPlate"/>
+		</module>
+
+
+		<module name="ridge1" type="RidgedMultifractal" seed_additive="10">
+		<!--Mountain detailing base module-->
+			<property name="frequency" value="0.82345"/>
+			<property name="octaveCount" value="8"/>
+		</module>
+		<module name="ridge2" type="RidgedMultifractal" seed_additive="11">
+		<!--Mountain detailing base module-->
+			<property name="frequency" value="0.8"/>
+			<property name="octaveCount" value="8"/>
+		</module>
+		<module name="ridgeCombine" type="LargerOutput">
+		<!--Detailing module A Ridge module-->
+			<property name="sourceModule1" value="ridge1"/>
+			<property name="sourceModule2" value="ridge2"/>
+		</module>
+		<module name="ridgeCombineTurb" type="FastTurbulence" seed_additive="12">
+		<!--Add variation of detailing module A-->
+			<property name="sourceModule" value="ridgeCombine"/>
+			<property name="frequency" value="0.8"/>
+			<property name="power" value="0.1"/>
+			<property name="roughness" value="4"/>
+		</module>
+		<module name="ridgeCombineScaled" type="ScaleOutput">
+		<!--Decides peak height of detailing module A-->
+			<property name="sourceModule" value="ridgeCombineTurb"/>
+			<property name="scale" value="0.2"/>
+		</module>
+		<module name="ridgeMulti" type="Multiply">
+		<!--Detailing module B Sharp and small mountain with lake-->
+			<property name="sourceModule1" value="ridge1"/>
+			<property name="sourceModule2" value="ridge2"/>
+		</module>
+		<module name="ridgeMultiScaled" type="ScaleOutput">
+		<!--Decides peak height of detailing module B-->
+			<property name="sourceModule" value="ridgeMulti"/>
+			<property name="scale" value="0.8"/>
+		</module>
+
+		<module name="mntBaseBaseBase" type="RidgedMultifractal" seed_additive="13">
+		<!--Controls how frequently mountain peak appears.-->
+			<property name="frequency" value="0.4"/>
+			<property name="octaveCount" value="10"/>
+		</module>
+		<module name="mntBaseBase" type="FastTurbulence" seed_additive="14">
+		<!--Controls how much mountain peak looks wavy
+		    frequency controls wave frequency
+		    power controls wave size-->
+			<property name="sourceModule" value="mntBaseBaseBase"/>
+			<property name="frequency" value="0.6"/>
+			<property name="power" value="0.3"/>
+			<property name="roughness" value="8"/>
+		</module>
+		<module name="mntBase" type="FastTurbulence" seed_additive="15">
+		<!--Peak detailing module-->
+			<property name="sourceModule" value="mntBaseBase"/>
+			<property name="frequency" value="2"/>
+			<property name="power" value="0.05"/>
+			<property name="roughness" value="6"/>
+		</module>
+		<module name="mnt" type="ExponentialOutput">
+		<!--Intensify mountain peak and valley-->
+			<property name="sourceModule" value="mntBase"/>
+			<property name="exponent" value="1.4"/>
+		</module>
+		<module name="mntDetailFiller" type="Blend">
+		<!--Mix 2 detailing module.
+		    Ridge should appears at mountain area
+		    Small mountain and lake should appears at valley area-->
+			<property name="controlModule" value="mnt"/>
+			<property name="sourceModule1" value="ridgeMultiScaled"/>
+			<property name="sourceModule2" value="ridgeCombineScaled"/>
+		</module>
+		<module name="mntDetailed" type="Add">
+			<property name="sourceModule1" value="mnt"/>
+			<property name="sourceModule2" value="mntDetailFiller"/>
+		</module>
+		<module name="mntOutput" type="ScaleBiasOutput">
+		<!--Decides peak height of mountain.-->
+			<property name="sourceModule" value="mntDetailed"/>
+			<property name="scale" value="0.76"/>
+			<property name="bias" value="0.76"/>
+		</module>
+
+
+		<module name="landCtrl" type="FastNoise" seed_additive="20">
+		<!--Controls how frequently exchange plains and mountains
+		    Edit frequency to modify-->
+			<property name="frequency" value="0.6"/>
+			<property name="octaveCount" value="6"/>
+		</module>
+		<!--<module name="landMixed" type="Select">
+			<property name="controlModule" value="landCtrl"/>
+			<property name="sourceModule1" value="plainOutput"/>
+			<property name="sourceModule2" value="mntOutput"/>
+			<property name="bounds" value="0.2,100"/>.1
+			<property name="edgeFalloff" value="0.5"/>.6
+		</module>-->
+		<module name="landPreMixed" type="Select">
+		<!--Smooth transition area from plain into mountain
+		    bounds (left) controls size of plain area
+		      Larger bounds (left), larger plain area
+		    edgeFalloff controls how smoothly transit
+		      Higher edgeFalloff, more smooth
+		    -->
+			<property name="controlModule" value="landCtrl"/>
+			<property name="sourceModule1" value="plainOutput"/>
+			<property name="sourceModule2" value="mntOutput"/>
+			<property name="bounds" value="0.6,100"/>
+			<property name="edgeFalloff" value="0.75"/>
+		</module>
+		<module name="landMixed" type="Select">
+		<!--Vivid transition from mountain around to mountain peak
+		    bounds (left) controls size of vivid transition area
+		      Lower bounds (left), larger vivid area
+		    edgeFalloff controls how vividly transit
+		      Lower edgeFalloff, more vividly transit-->
+			<property name="controlModule" value="landCtrl"/>
+			<property name="sourceModule1" value="landPreMixed"/>
+			<property name="sourceModule2" value="mntOutput"/>
+			<property name="bounds" value="0.6,100"/>
+			<property name="edgeFalloff" value="0.4"/>
+		</module>
+
+
+		<module name="riverCtrlBaseBaseBase" type="FastNoise" seed_additive="30">
+			<property name="frequency" value="0.2"/>
+			<property name="octaveCount" value="6"/>
+		</module>
+		<module name="riverCtrlBaseBase" type="ScaleInput">
+		<!--Cancel y to disable unintended turbulence-->
+			<property name="sourceModule" value="riverCtrlBaseBaseBase"/>
+			<property name="y" value="0"/>
+		</module>
+		<module name="riverCtrlBase" type="FastTurbulence" seed_additive="31">
+			<property name="sourceModule" value="riverCtrlBaseBase"/>
+			<property name="frequency" value="1"/>
+			<property name="power" value="0.2"/>
+			<property name="roughness" value="6"/>
+		</module>
+		<module name="riverCtrl" type="AbsoluteOutput">
+			<property name="sourceModule" value="riverCtrlBase"/>
+		</module>
+		<module name="riverSideCtrl" type="FastTurbulence" seed_additive="32">
+			<property name="sourceModule" value="riverCtrl"/>
+			<property name="frequency" value="50"/>
+			<property name="power" value="0.01"/>
+			<property name="roughness" value="2"/>
+		</module>
+
+		<module name="landBase" type="Constant">
+		<!--Plain height-->
+			<property name="constant" value="0.16"/>
+		</module>
+		<module name="riverSideBase" type="Constant">
+		<!--In-game -27-->
+			<property name="constant" value="0.15"/>
+		</module>
+		<module name="riverBase" type="Constant">
+		<!--In-game -38-->
+			<property name="constant" value="0.14"/>
+		</module>
+
+		<module name="worldTransit" type="Select">
+		<!--Shrink mountains and hills into plains around the river for natural transition-->
+			<property name="controlModule" value="riverSideCtrl"/>
+			<property name="sourceModule1" value="landMixed"/>
+			<property name="sourceModule2" value="landBase"/>
+			<property name="bounds" value="-100,0.25"/>
+			<property name="edgeFalloff" value="0.1"/>
+		</module>
+		<module name="worldRiverSide" type="Select">
+		<!--Lower height nearby river to make less randomized river width-->
+			<property name="controlModule" value="riverSideCtrl"/>
+			<property name="sourceModule1" value="worldTransit"/>
+			<property name="sourceModule2" value="riverSideBase"/>
+			<property name="bounds" value="-100,0.1"/>
+			<property name="edgeFalloff" value="0.05"/>
+		</module>
+		<module name="worldRiver" type="Select">
+		<!--Actual river-->
+			<property name="controlModule" value="riverCtrl"/>
+			<property name="sourceModule1" value="worldRiverSide"/>
+			<property name="sourceModule2" value="riverBase"/>
+			<property name="bounds" value="-100,0.02"/>
+			<property name="edgeFalloff" value="0.02"/>
+		</module>
+
+
+		<module name="finalUpperZero" type="BiasOutput">
+		<!-- Invert @-11,191 GAP:202 -->
+			<property name="sourceModule" value="worldRiver"/>
+			<property name="bias" value="-1.91"/>
+		</module>
+		<module name="finalUpperInvert" type="AbsoluteOutput">
+			<property name="sourceModule" value="finalUpperZero"/>
+		</module>
+		<module name="finalLowerZero" type="BiasOutput">
+			<property name="sourceModule" value="finalUpperInvert"/>
+			<property name="bias" value="-2.02"/>
+		</module>
+		<module name="finalLowerInvert" type="AbsoluteOutput">
+			<property name="sourceModule" value="finalLowerZero"/>
+		</module>
+		<module name="finalZeroZero" type="BiasOutput">
+			<property name="sourceModule" value="finalLowerInvert"/>
+			<property name="bias" value="-0.11"/>
+		</module>
+		<module name="finalOutput" type="ClampOutput">
+		<!-- Smoothing InvertPoints -->
+			<property name="sourceModule" value="finalZeroZero"/>
+			<property name="bounds" value="-0.10,1.90"/>
+		</module>
+
+
+		<module name="A16toA17" type="ScaleInput">
+			<property name="sourceModule" value="finalOutput"/>
+			<property name="x" value="0.001953125"/>
+			<property name="z" value="0.001953125"/>
+		</module>
+		<module name="scaleBiasOutput" type="ScaleBiasOutput">
+			<property name="sourceModule" value="A16toA17"/>
+			<property name="scale" value="100"/>
+			<property name="bias" value="9"/>
+		</module>
+
+		<output module="scaleBiasOutput"/>
+	</terrain_generator>
+</set>
+</configs>
